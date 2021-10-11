@@ -17,43 +17,38 @@ Notifications.setNotificationHandler({
 
 export default function App() {
   //Get iOS permissions for notifications
-  const getIOSPermissions = useCallback(async () => {
-    Platform.OS === "ios" && (await Notifications.requestPermissionsAsync());
+  const getPermissions = useCallback(async () => {
+    const permission = await Notifications.requestPermissionsAsync();
+    console.log(`[${Platform.OS}] Permission:`, permission);
+
+    if (permission.status !== "granted") {
+      Alert.alert("Permissions required for notifications");
+    } else {
+      //Only call if permission is granted
+      getPushToken();
+    }
   }, []);
+
+  //Get Push token from Expo Servers
+  const getPushToken = async () => {
+    const pushToken = await Notifications.getExpoPushTokenAsync();
+    console.log(`[${Platform.OS}] Push Token:`, pushToken);
+  };
 
   //Background - Local Notification Trigger
   const triggerNotificationHandler = async () => {
-    //Get permission status
-    const iosPermission =
-      Platform.OS === "ios" && (await Notifications.getPermissionsAsync());
-
-    if (Platform.OS === "ios") {
-      if (iosPermission.status === "granted") {
-        Notifications.scheduleNotificationAsync({
-          content: { title: "Test Local", body: "Local Notification test" },
-          trigger: {
-            seconds: 5,
-          },
-          // identifier:
-        });
-      } else {
-        Alert.alert("Permissions required for notifications");
-      }
-    } else {
-      //Android Notification
-      Notifications.scheduleNotificationAsync({
-        content: { title: "Test Local", body: "Local Notification test" },
-        trigger: {
-          seconds: 10,
-        },
-        // identifier:
-      });
-    }
+    Notifications.scheduleNotificationAsync({
+      content: { title: "Test Local", body: "Local Notification test" },
+      trigger: {
+        seconds: 5,
+      },
+      // identifier:
+    });
   };
 
   useEffect(() => {
-    getIOSPermissions();
-  }, [getIOSPermissions]);
+    getPermissions();
+  }, [getPermissions]);
 
   useEffect(() => {
     //When notification arrived on foreground
