@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect } from "react";
 import { StyleSheet, Text, View, Button, Platform, Alert } from "react-native";
-import { StatusBar } from "expo-status-bar";
 
 import * as Notifications from "expo-notifications";
 
@@ -16,10 +15,15 @@ Notifications.setNotificationHandler({
 });
 
 export default function App() {
-  //Get iOS permissions for notifications
+  //Get permissions for notifications
   const getPermissions = useCallback(async () => {
-    const permission = await Notifications.requestPermissionsAsync();
-    console.log(`[${Platform.OS}] Permission:`, permission);
+    let permission = await Notifications.getPermissionsAsync();
+    console.log(`[${Platform.OS}] Check Permission:`, permission.status);
+
+    if (permission.status !== "granted") {
+      permission = await Notifications.requestPermissionsAsync();
+      console.log(`[${Platform.OS}] Request Permission:`, permission.status);
+    }
 
     if (permission.status !== "granted") {
       Alert.alert("Permissions required for notifications");
