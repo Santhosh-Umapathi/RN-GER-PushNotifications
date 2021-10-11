@@ -32,7 +32,7 @@ export default function App() {
   //Get Push token from Expo Servers
   const getPushToken = async () => {
     const pushToken = await Notifications.getExpoPushTokenAsync();
-    console.log(`[${Platform.OS}] Push Token:`, pushToken);
+    console.log(`[${Platform.OS}] Push Token:`, pushToken.data);
   };
 
   //Background - Local Notification Trigger
