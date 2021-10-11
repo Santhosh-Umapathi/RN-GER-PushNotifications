@@ -36,13 +36,34 @@ export default function App() {
   };
 
   //Background - Local Notification Trigger
-  const triggerNotificationHandler = async () => {
+  const sendLocalNotification = async () => {
     Notifications.scheduleNotificationAsync({
       content: { title: "Test Local", body: "Local Notification test" },
       trigger: {
         seconds: 5,
       },
       // identifier:
+    });
+  };
+
+  const iosToken = "ExponentPushToken[9gn1sBKMJWaWEtyEL_z35S]";
+  const androidToken = "ExponentPushToken[7RpDmeDzy5Rma92LE_LLHJ]";
+
+  //This can be managed from the Backend, only get users device token during login/signup
+  const sendPushNotification = async () => {
+    //Can also send push notifications to other devices
+    await fetch("https://exp.host/--/api/v2/push/send", {
+      method: "POST",
+      headers: {
+        Accept: "Application/json",
+        "Accept-Encoding": "gzip, deflate",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        to: Platform.OS === "ios" ? androidToken : iosToken,
+        title: `Push sent from ${Platform.OS}`,
+        body: "Push Body",
+      }),
     });
   };
 
@@ -71,12 +92,22 @@ export default function App() {
 
   return (
     <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-      <Button
-        title="Trigger Notification"
-        onPress={triggerNotificationHandler}
-      />
+      <Text style={{ fontSize: 20, marginBottom: 20 }}>
+        Local & Push Notifications
+      </Text>
+
+      <View style={styles.buttonContainer}>
+        <Button
+          title="Trigger Local Notification"
+          onPress={sendLocalNotification}
+        />
+      </View>
+      <View style={styles.buttonContainer}>
+        <Button
+          title="Trigger Push Notification"
+          onPress={sendPushNotification}
+        />
+      </View>
     </View>
   );
 }
@@ -87,5 +118,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     alignItems: "center",
     justifyContent: "center",
+  },
+  buttonContainer: {
+    width: "60%",
+    margin: 10,
   },
 });
